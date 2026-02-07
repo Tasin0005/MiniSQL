@@ -69,7 +69,6 @@ class Token:
 
 def lexer(input_string):
     token_stream = []
-    string_stream = [] # TEMPORARY FOR TESTING PURPOSES ONLY
     index = 0
     while index < len(input_string):
         if (input_string[index] == ' '):
@@ -77,34 +76,33 @@ def lexer(input_string):
             continue
         elif is_keyword(input_string, index):
             keyword, ending_index = get_keyword(input_string, index) # ending_index should be the index of space after the token, if the token is at the end of the string, it should be len(input_string)
-            string_stream.append(keyword) # TEMPORARY FOR TESTING PURPOSES ONLY
+            token_stream.append(Token("keyword", keyword))
             index = ending_index
         elif is_string(input_string, index):
             string, ending_index = get_string(input_string, index)
-            string_stream.append(string) # TEMPORARY FOR TESTING PURPOSES ONLY
+            token_stream.append(Token("string", string))
             index = ending_index
         elif is_separator(input_string, index):
             separator, ending_index = get_separator(input_string, index)
-            string_stream.append(separator) # TEMPORARY FOR TESTING PURPOSES ONLY
+            token_stream.append(Token("separator", separator))
             index = ending_index
         elif is_operator(input_string, index):
             operator, ending_index = get_operator(input_string, index)
-            string_stream.append(operator) # TEMPORARY FOR TESTING PURPOSES ONLY
+            token_stream.append(Token("operator", operator))
             index = ending_index
         elif is_number(input_string, index):
             number, ending_index = get_number(input_string, index)
-            string_stream.append(number) # TEMPORARY FOR TESTING PURPOSES ONLY
+            token_stream.append(Token("number", number))
             index = ending_index
         elif is_identifier(input_string, index):
             identifier, ending_index = get_identifier(input_string, index)
-            string_stream.append(identifier) # TEMPORARY FOR TESTING PURPOSES ONLY
+            token_stream.append(Token("identifier", identifier))
             index = ending_index
         else:
             print("Please enter a valid SQL command")
             break
-    
-    print(string_stream) # TEMPORARY FOR TESTING PURPOSES ONLY
-    return
+
+    return token_stream
 
 def is_keyword(input_string, index):
     keywords = ["CREATE", "TABLE", "INSERT", "INTO", "VALUES", "SELECT", "FROM", "WHERE", "UPDATE", "SET", "DELETE", "DROP", "*"]
