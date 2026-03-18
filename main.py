@@ -63,6 +63,59 @@ Please visit https://github.com/Tasin0005/MiniSQL/ for more information
         case _:
             print("Please enter a valid meta command (.help, .exit, .tables, .schema)")
 
+class Node:
+    def __init__(self, data, left, right):
+        self.data = data
+        self.left = left
+        self.right = right
+
+def insert_left_node(parent_node, child_node):
+    parent_node.left = child_node
+
+def insert_right_node(parent_node, child_node):
+    parent_node.right = child_node
+    
+# e.g [1,2,3,4,5,6,7,8]
+def create_tree_insert_all_left(num_arr):
+    root = Node(num_arr[0], None, None)
+    prev_node = root
+    for i in range(1, len(num_arr)):
+        current_node = Node(num_arr[i], None, None)
+        insert_left_node(prev_node, current_node)
+        prev_node = current_node
+        
+    return root # return root node so you actually get the tree
+        
+def create_tree_insert_all_right(num_arr):
+    root = Node(num_arr[0], None, None)
+    prev_node = root
+    for i in range(1, len(num_arr)):
+        current_node = Node(num_arr[i], None, None)
+        insert_right_node(prev_node, current_node)
+        prev_node = current_node
+        
+    return root 
+
+def parse(token_stream):
+    initial_token = token_stream[0]
+    start = initial_token.value
+
+    match start:
+        case "CREATE":
+            pass
+        case "INSERT":
+            pass
+        case "SELECT":
+            pass
+        case "UPDATE":
+            pass
+        case "DELETE":
+            pass
+        case "DROP":
+            pass
+
+    return
+
 # only run main() if the main.py file was executed as a script and not as a module
 if __name__ == "__main__":
     main()
