@@ -102,19 +102,45 @@ def parse(token_stream):
 
     match start:
         case "CREATE":
-            pass
+            AST = parse_create(token_stream)
         case "INSERT":
-            pass
+            AST = parse_insert(token_stream)
         case "SELECT":
-            pass
+            AST = parse_select(token_stream)
         case "UPDATE":
-            pass
+            AST = parse_update(token_stream)
         case "DELETE":
-            pass
+            AST = parse_delete(token_stream)
         case "DROP":
-            pass
+            AST = parse_drop(token_stream)
+        case _:
+            print("Please enter a valid SQL command (CREATE, INSERT, SELECT, UPDATE, DELETE, DROP)")
 
     return
+
+def parse_create(token_stream):
+    root_node = None
+    return root_node
+
+def parse_insert(token_stream):
+    root_node = None
+    return root_node
+
+def parse_select(token_stream):
+    root_node = None
+    return root_node
+
+def parse_update(token_stream):
+    root_node = None
+    return root_node
+
+def parse_delete(token_stream):
+    root_node = None
+    return root_node
+
+def parse_drop(token_stream):
+    root_node = None
+    return root_node
 
 # only run main() if the main.py file was executed as a script and not as a module
 if __name__ == "__main__":
