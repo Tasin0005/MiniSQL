@@ -11,6 +11,7 @@ def main():
             meta_command(user_input)
         else:
             token_stream = lexer.lex(user_input)
+            parse(token_stream)
 
 # Determines if user text input is a meta command (starts with .) or an SQL command
 # Note: User input is strictly either a meta command or an SQL command
@@ -63,7 +64,7 @@ Please visit https://github.com/Tasin0005/MiniSQL/ for more information
         case _:
             print("Please enter a valid meta command (.help, .exit, .tables, .schema)")
 
-class Node:
+class ASTNode:
     def __init__(self, data, left, right):
         self.data = data
         self.left = left
@@ -74,29 +75,11 @@ def insert_left_node(parent_node, child_node):
 
 def insert_right_node(parent_node, child_node):
     parent_node.right = child_node
-    
-# e.g [1,2,3,4,5,6,7,8]
-def create_tree_insert_all_left(num_arr):
-    root = Node(num_arr[0], None, None)
-    prev_node = root
-    for i in range(1, len(num_arr)):
-        current_node = Node(num_arr[i], None, None)
-        insert_left_node(prev_node, current_node)
-        prev_node = current_node
-        
-    return root # return root node so you actually get the tree
-        
-def create_tree_insert_all_right(num_arr):
-    root = Node(num_arr[0], None, None)
-    prev_node = root
-    for i in range(1, len(num_arr)):
-        current_node = Node(num_arr[i], None, None)
-        insert_right_node(prev_node, current_node)
-        prev_node = current_node
-        
-    return root 
 
 def parse(token_stream):
+    if not token_stream:
+        return
+
     initial_token = token_stream[0]
     start = initial_token.value
 
@@ -119,7 +102,49 @@ def parse(token_stream):
     return
 
 def parse_create(token_stream):
-    root_node = None
+
+    # Define helper functions before any code that calls them
+    def parse_column_list(token_stream, index):
+
+        # Base case: closing parenthesis means no more columns
+        if token_stream[index].value == ")":
+            return None, index
+
+        column_node, index = parse_column_def(token_stream, index)
+
+        if index < len(token_stream) and token_stream[index].value == ",":
+            index += 1  # skip comma
+            column_node.right, index = parse_column_list(token_stream, index)
+
+        return column_node, index
+
+    def parse_column_def(token_stream, index):
+        column_node = ASTNode(lexer.Token("column", "COLUMN_DEF"), None, None)
+
+        # Define column name node
+        name_node = ASTNode(token_stream[index], None, None)
+        index += 1
+
+        # Define column type node
+        type_node = ASTNode(token_stream[index], None, None)
+        index += 1
+
+        # insert nodes into the tree
+        name_node.right = type_node
+        column_node.left = name_node 
+
+        return column_node, index
+
+    # Create the root node for the AST
+    root_node = ASTNode(lexer.Token("keyword", "CREATE TABLE"), None, None)
+
+    index = 2  # skip CREATE and TABLE tokens
+    root_node.left = ASTNode(token_stream[index], None, None)  # table name
+    index += 2  # skip table name and opening parenthesis
+
+    # Start recursive descent parsing of the column list
+    root_node.right, index = parse_column_list(token_stream, index)
+
     return root_node
 
 def parse_insert(token_stream):
@@ -141,7 +166,7 @@ def parse_delete(token_stream):
 def parse_drop(token_stream):
     root_node = None
     return root_node
-
+    
 # only run main() if the main.py file was executed as a script and not as a module
 if __name__ == "__main__":
     main()
