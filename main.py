@@ -148,7 +148,41 @@ def parse_create(token_stream):
     return root_node
 
 def parse_insert(token_stream):
-    root_node = None
+
+    def parse_value_list(token_stream, index):
+        # base case: if closing parenthesis reached, return None as there are no more values
+        if token_stream[index].value == ")":
+            return None, index
+        
+        # parse a singular value and create a node for it
+        value_node, index = parse_value_def(token_stream, index)
+
+        # continue recursion until base case is reached
+        if index < len(token_stream) and token_stream[index].value == ",":
+            index += 1 # skip comma
+            value_node.right, index = parse_value_list(token_stream, index)
+
+        return value_node, index
+    
+    def parse_value_def(token_stream, index):
+
+        # create value node and insert the value token as its left child
+        value_node = ASTNode(lexer.Token("value", "VALUE_DEF"), None, None)
+        value_node.left = ASTNode(token_stream[index], None, None)
+        index += 1
+
+        return value_node, index
+
+    # Create the root node for the AST
+    root_node = ASTNode(lexer.Token("keyword", "INSERT INTO"), None, None)
+
+    index = 2 # skip INSERT and INTO tokens
+    root_node.left = ASTNode(token_stream[index], None, None) # table name
+    index += 3 # skip table name, VALUES token and opening parenthesis
+
+    # Start recursive descent parsing of the value list
+    root_node.right, index = parse_value_list(token_stream, index)
+
     return root_node
 
 def parse_select(token_stream):
