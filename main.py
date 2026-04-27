@@ -194,7 +194,36 @@ def parse_update(token_stream):
     return root_node
 
 def parse_delete(token_stream):
-    root_node = None
+
+    # helper function added here so in future if more complex WHERE conditions e.g WHERE id = 2 AND name = "Alice" are needed
+    # it can be easily implemented without needing to change the main body of the parse_delete function
+    # make this function recursive if more complex WHERE conditions are needed in the future
+    def parse_delete_where(token_stream, index):
+
+        column_name_node = ASTNode(token_stream[index], None, None)
+        index += 1 # skip column name
+        operator_node = ASTNode(token_stream[index], None, None)
+        index += 1 # skip operator
+        value_node = ASTNode(token_stream[index], None, None)
+        index += 1 # skip value
+
+        insert_left_node(operator_node, column_name_node)
+        insert_right_node(operator_node, value_node)
+
+        return operator_node
+
+    root_node = ASTNode(lexer.Token("keyword", "DELETE FROM"), None, None)
+
+    index = 2 # skip DELETE and FROM tokens
+    root_node.left = ASTNode(token_stream[index], None, None) # table name
+    index += 1 # skip table name
+
+    if index < len(token_stream) and token_stream[index].value == "WHERE":
+        root_node.right = ASTNode(lexer.Token("keyword", "WHERE"), None, None)
+        index += 1 # skip WHERE token
+
+        root_node.right.left = parse_delete_where(token_stream, index)
+
     return root_node
 
 def parse_drop(token_stream):
